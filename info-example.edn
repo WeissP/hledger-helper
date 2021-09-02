@@ -1,0 +1,27 @@
+{:asserts {:commerz {:last-update-date "2021-08-28", :start-date nil},
+           :deutsche {:last-transaction-date nil, :start-date nil},
+           :paypal {:last-update-date "2021-08-28", :start-date nil},
+           :wechat {:last-transaction-date nil, :start-date nil}},
+ :budget {:amount 850,
+          :carried-balance 462.66,
+          :exclusive-expenses ["expenses:utilities:internet:home:vodafone"
+                               "expenses:medical:insurance"
+                               "expenses:utilities:rundfunkbeitrag"],
+          :modifiers {:rundfunk {:amount 0,
+                                 :end? false,
+                                 :repeat [35 -17.5 -17.5],
+                                 :start-at "2021-07-01"}},
+          :rollover {:amount 287, :month 8}},
+ :import-transactions
+   {:asserts {:mensa {:tuk-mensa "Hochschule Kaiserslautern"}},
+    :expenses {:education {:uni {:semesterbeitrag
+                                   "Landeshochschulkasse Mainz"}}}},
+ :single-transactions {:coins {:act1 "asserts:cash:münzeinwurf",
+                               :act2 "asserts:cash:hand",
+                               :children [:münze],
+                               :desc "coins exchange"},
+                       :mensa {:act1 "expenses:food:groceries",
+                               :act2 "asserts:mensa:tuk",
+                               :children
+                                 [{:mensah {:amount "2,65", :desc "mensa"}}
+                                  {:mensan {:amount "2,40", :desc "mensa"}}]}}}

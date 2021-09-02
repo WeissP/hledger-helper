@@ -1,0 +1,71 @@
+A personal hledger assistant, mainly used for more powerful Budget reporting, automatically importing transactions with =aqbanking= and =HBCI=  and quickly adding new transaction manually.
+
+* Configuration
+
+all Configuration are stored in =info.edn=. 
+
+** budget
+
+*** :amount
+:PROPERTIES:
+:ID:       c08279dd-602c-4ac1-ac76-226674bbaf9a
+:END:
+
+the expected total cost amount every month (inclusive [[id:d375694e-432a-4637-bd76-79385fc0feca][non-budget-amount]])
+
+*** :carried-balance
+
+the start amount
+
+*** :exclusive-expenses
+:PROPERTIES:
+:ID:       d375694e-432a-4637-bd76-79385fc0feca
+:END:
+
+ expenses that should not calculated in budget(normally fixed cost)
+
+*** :modifiers
+
+**** amount
+
+total delta amount. e.g. -100 means your budget amount need to decrease 100 in several month.
+
+if amount is zero, means that this budget modifier doesn't change budget total amount (e.g.  +20 € in this month but -20€ in next month)
+
+**** end?
+
+current budget modifier will be stoped if =amount= is zero and =end?= is true
+
+**** repeat
+
+a list that each element is delta amount in single month, like =[-10]= means that budget amount will monthly decreased by 10€.
+
+the first element modify the amont in the month defined in [[id:9ff2480a-7e20-401e-a84f-8ef5a6bb3517][start-at]] . 
+
+**** start-at
+:PROPERTIES:
+:ID:       9ff2480a-7e20-401e-a84f-8ef5a6bb3517
+:END:
+
+the =date= that start current budget modifier
+
+*** rollover
+
+** import-transactions
+
+contains a tree, the value of each leaf is a string (or a list of string) that infomation parsed from csv must includes. All keys from root to leaf are the account for the transaction. e.g. ={:asserts {:mensa {:tuk-mensa "Hochschule Kaiserslautern"}}}= means "asserts:mensa:tuk-mensa"
+
+if value is =nil=, means that the string is the name of its direct key.
+
+** single-transactions
+
+this is for adding transactions manully. You can add transaction by typing =add [the name of key] amount=  
+
+*** children
+
+=children= will inherit all properties from its parent
+
+*** amount
+
+the default amount
+
