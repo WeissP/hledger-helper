@@ -5,7 +5,8 @@
             [cljc.java-time.local-date :as ld]
             [clojure.string :as string]
             [doric.core :refer [table raw]]
-            [hledger-helper.operations.date :as date]))
+            [hledger-helper.operations.date :as date]
+            [hledger-helper.operations.currency :as cur]))
 
 (def non-budget-expenses
   "all expenses that will not be calculated in budgets "
@@ -46,7 +47,6 @@
   [month]
   (apply info/get-cost-by-month month non-budget-expenses))
 
-
 (defn get-budget-mod-amount
   "get modifered amount by `date` and `key`"
   [modifier-key date]
@@ -68,15 +68,24 @@
     (reduce +
       (filter some? (map #(get-budget-mod-amount % date) (keys mods))))))
 
+(defn get-budget-revenues-total-amount
+  ([] (get-budget-revenues-total-amount (date/current-month)))
+  ([month] (info/get-cost-by-month month "revenues:job:part-time")))
+
+(defn get-budget-total-amounts
+  ([] (get-budget-total-amounts (date/current-month)))
+  ([month]
+   (+ (pedn/get-budget-amount)
+      (get-budget-revenues-total-amount month)
+      (:amount (pedn/get-budget-rollover))
+      (get-budget-mod-total-amounts month))))
+
 (defn update-budget-rollover
   "update budget rollover to current month"
   []
   (let [rollover-month (:month (pedn/get-budget-rollover))
-        rollover-amount (:amount (pedn/get-budget-rollover))
         current-month (ld/get-month-value (ld/now))
-        budget-amount (+ (pedn/get-budget-amount)
-                         rollover-amount
-                         (get-budget-mod-total-amounts rollover-month))]
+        budget-amount (get-budget-total-amounts rollover-month)]
     (when-not (= rollover-month current-month)
       (pedn/update-rollover (- budget-amount
                                (info/get-cost-by-month rollover-month)))
@@ -97,12 +106,10 @@
          days-in-month-flt (/ day-of-month length-of-month)
          used-budget (- (info/get-cost-by-month current-month)
                         (get-non-budget-cost current-month))
-         expected-total-budget
-           (- (+ (pedn/get-budget-amount)
-                 (:amount (pedn/get-budget-rollover))
-                 (get-budget-mod-total-amounts current-month))
-              (get-non-budget-cost (ld/get-month-value (ld/minus-months (ld/now)
-                                                                        1))))
+         expected-total-budget (- (get-budget-total-amounts)
+                                  (get-non-budget-cost
+                                    (ld/get-month-value
+                                      (ld/minus-months (ld/now) 1))))
          rest-budget (- expected-total-budget used-budget)]
      (print (info/get-costs-by-depth depth))
      (println
@@ -112,24 +119,18 @@
           {:name :b, :title "", :align :left}
           {:name :c, :title "", :align :left}]
          [{:a "Used/Total:",
-           :b (format "[%.2f €/%.2f €] " used-budget expected-total-budget),
+           :b (format "[%s/%s] "
+                      (cur/display-float used-budget)
+                      (cur/display-float expected-total-budget)),
            :c (show-bar (/ used-budget expected-total-budget) length-of-month)}
           {:a "Days:",
            :b (format "[%s/%s]" day-of-month length-of-month),
            :c (show-bar days-in-month-flt length-of-month)}
-          {:a "Rest Budget:", :b (format "%.2f €" rest-budget)}
+          {:a "Rest Budget:", :b (cur/display-float rest-budget)}
           {:a "Rest Budget in days:",
-           :b (format "%.2f €"
-                      (- (* expected-total-budget days-in-month-flt)
-                         used-budget))}])))))
+           :b (cur/display-float (- (* expected-total-budget days-in-month-flt)
+                                    used-budget))}])))))
 
 (defn cost-report [& args] (println (apply info/get-costs-by-depth args)))
-
-
-
-
-
-
-
 
 

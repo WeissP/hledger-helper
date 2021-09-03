@@ -114,6 +114,25 @@
   ([cur-dis]
    (if (float? cur-dis) cur-dis (apply to-float (parse-display cur-dis)))))
 
+(defn flt->list
+  [flt]
+  (-> flt
+      bigdec
+      (* 100)
+      int
+      amt-dec->list))
+
+(defn to-float! [& args] (if (nil? (first args)) 0 (apply to-float args)))
+
+(defn display-float
+  ([flt] (display-float flt "EURO"))
+  ([flt cur-name]
+  (-> flt
+      flt->list
+      list->amt-list
+      (amt-list->amt cur-name)
+      (display cur-name))))
+
 (defn convert-amount
   "normalize number with sign and number notation"
   [number &

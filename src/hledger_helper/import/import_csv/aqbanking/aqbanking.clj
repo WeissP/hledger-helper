@@ -71,7 +71,9 @@
                                  :number-notation-from "USD"
                                  :operation "reverse")])
         [currency2 currency1]
-          (if (= (count currencies) 3) currencies ["" (first currencies)])]
+          (if (= (count currencies) 3)
+            currencies
+            ["" (if (empty? (first currencies)) "EURO" (first currencies))])]
     (tt/to-transaction info
                        bank-date
                        amount1

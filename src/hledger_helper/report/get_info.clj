@@ -29,8 +29,8 @@
           (str date-from ".." date-to)
           (if (empty? categories) ["expenses"] categories))
         :out
-        (re-find #"\d+\,?\d+ €")
-        cur/to-float)))
+        (re-find #"[\d\.]+\,?\d+ €")
+        cur/to-float!)))
 
 (defn get-cost-by-month
   [month & categories]
