@@ -38,6 +38,10 @@
        csv->map-list))
 
 
+(defn write-map-list
+  [path map-list]
+  (with-open [writer (io/writer path)] (csv/write-csv writer map-list)))
+
 (defn get-diff [old new] (set/difference (set new) (set old)))
 
 (defn dir->map-list

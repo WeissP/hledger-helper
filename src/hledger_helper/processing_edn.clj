@@ -4,7 +4,7 @@
             [clojure.pprint :as pprint]
             [clojure.string :as string]))
 
-(def filepath "info.edn")
+(def filepath "/home/weiss/finance/info.edn")
 
 (defn read-edn [] (edn/read-string (slurp filepath)))
 

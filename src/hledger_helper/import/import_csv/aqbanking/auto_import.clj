@@ -58,6 +58,8 @@
                                    to-transaction-fun)
       (pedn/update-last-update-date assert-key (ld/to-string (ld/now))))))
 
+(import-single-assert :commerz commerz/convert-info)
+
 (defn import-all
   []
   (pedn/update-import-transactions)
