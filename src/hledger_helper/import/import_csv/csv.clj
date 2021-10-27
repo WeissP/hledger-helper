@@ -31,18 +31,31 @@
   ([path] (file->csv path \,))
   ([path sep] (csv/read-csv (io/reader path) :separator sep)))
 
-
 (defn file->map-list
   [& args]
   (->> (apply file->csv args)
        csv->map-list))
 
-
-(defn write-map-list
+(defn append-map-list
   [path map-list]
-  (with-open [writer (io/writer path)] (csv/write-csv writer map-list)))
+  (let [keys (get-csv-key-list (file->csv path \;))
+        comp (fn [x y] (compare (.indexOf keys x) (.indexOf keys y)))
+        getVals (fn [m] (vals (into (sorted-map-by comp) m)))
+        vals (map getVals map-list)
+        res (map #(map first %) vals)]
+    (with-open [writer (io/writer path :append true)]
+      (csv/write-csv writer res :separator \; :quote? (fn [_] true)))))
+
 
 (defn get-diff [old new] (set/difference (set new) (set old)))
+
+;; (append-map-list
+;;   "/home/weiss/clojure/hledger-helper/resources/aqbanking/commerz/test.csv"
+;;   (get-diff
+;;     []
+;;     (file->map-list
+;;       "/home/weiss/clojure/hledger-helper/resources/aqbanking/commerz/output.csv"
+;;       \;)))
 
 (defn dir->map-list
   [dir sep]

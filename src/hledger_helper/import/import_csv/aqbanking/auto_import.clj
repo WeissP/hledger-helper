@@ -40,7 +40,12 @@
         old-map (csv/file->map-list csv-path \;)
         new-map (csv/csv->map-list (csv/str->csv data \;))
         new-tr (csv/get-diff old-map new-map)]
-    (when-not (empty? new-tr) (spit csv-path data))
+    (when-not (empty? new-tr)
+      (csv/append-map-list csv-path new-tr)
+      ;; (if (> (count old-map) 100)
+      ;;   (spit csv-path data)
+      ;;   (spit csv-path (str "\n" data) :append true))
+    )
     new-tr))
 
 (defn import-single-assert
@@ -57,8 +62,6 @@
                                    compare-fields
                                    to-transaction-fun)
       (pedn/update-last-update-date assert-key (ld/to-string (ld/now))))))
-
-(import-single-assert :commerz commerz/convert-info)
 
 (defn import-all
   []

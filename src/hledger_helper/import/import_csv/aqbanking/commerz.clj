@@ -23,6 +23,7 @@
    :sep \;,
    :date :date,
    :compare-fields {},
-   :remove-maps [],
+   :remove-maps [{:remoteAccountNumber empty?}],
    :to-transaction to-transaction,
    :update-fn update-csv})
+
