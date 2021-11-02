@@ -7,6 +7,8 @@
 (defn remove-map
   "the value of pred-map is a funtion that revceive the value of elem in map-list with same key, then return true or false"
   [pred-map-list map-list]
+  ;; #dbg
+   ;; ^{:break/when (> (count map-list) 0)}
   (remove (fn [elem-map]
             (some (fn [pred-map]
                     (let [keylist (keys pred-map)]

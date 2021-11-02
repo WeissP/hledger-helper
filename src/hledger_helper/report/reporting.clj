@@ -90,9 +90,9 @@
       (pedn/update-rollover (- budget-amount
                                (info/get-cost-by-month rollover-month)))
       (doseq [k (keys (get-non-empty-amount-budget-mods))]
-        (pedn/update-budget-mod-amount k
-                                       (get-budget-mod-amount k
-                                                              rollover-month)))
+        (pedn/update-budget-mod-amount
+          k
+          (get-budget-mod-amount k (inc rollover-month))))
       (update-budget-rollover))))
 
 (defn budget-report

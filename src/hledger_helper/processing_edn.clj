@@ -46,7 +46,7 @@
                              "amount is already zero, can not be modified!")))
       (< (* ori-amount (- ori-amount delta-amount)) 0)
         (do (write-edn (-> (read-edn)
-                           (update-in [:budget :modifiers] dissoc :stuhl)
+                           (update-in [:budget :modifiers] dissoc k)
                            (update-in [:budget :finished-modifiers k]
                                       (constantly (assoc v :amount 0)))))
             (+ ori-amount delta-amount))
