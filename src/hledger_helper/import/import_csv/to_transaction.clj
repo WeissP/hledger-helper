@@ -22,10 +22,10 @@
 
 (defn to-transaction
   [info bank-date amount1 currency1 account2 &
-   {:keys [amount2 currency2 special-info-account-maps],
-    :or {amount2 "", currency2 ""}}]
+   {:keys [amount2 currency2 special-info-account-maps desc-date?],
+    :or {amount2 "", currency2 "", desc-date? false}}]
   (let [account1 (or (info->account info special-info-account-maps) "unknown")
-        desc-date (re-find date-reg info)
+        desc-date (when desc-date? (re-find date-reg info))
         real-date (or desc-date bank-date)
         desc (last (string/split account1 #":"))]
     (tr/simple-transaction

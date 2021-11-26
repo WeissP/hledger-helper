@@ -81,5 +81,6 @@
                        account2
                        :amount2 amount2
                        :currency2 currency2
-                       :special-info-account-maps special-info-account-maps)))
+                       :special-info-account-maps special-info-account-maps
+                       :desc-date? (= account2 "asserts:bank:commerz"))))
 

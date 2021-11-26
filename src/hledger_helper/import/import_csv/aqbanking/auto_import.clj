@@ -63,6 +63,23 @@
                                    to-transaction-fun)
       (pedn/update-last-update-date assert-key (ld/to-string (ld/now))))))
 
+(defn import-debug
+  [assert-key]
+  (let [assert-value (assert-key asserts-map)
+        m assert-value
+        trs (csv/file->map-list
+              "/home/weiss/clojure/hledger-helper/resources/aqbanking/debug.csv"
+              \;)
+        date-key :date
+        remove-maps (:remove-maps m)
+        compare-fields (:compare-fields m)
+        to-transaction-fun (:to-transaction m)]
+    (ic/import-single-assert trs
+                             date-key
+                             remove-maps
+                             compare-fields
+                             to-transaction-fun)))
+
 (defn import-all
   []
   (pedn/update-import-transactions)
@@ -76,4 +93,5 @@
             (Thread/sleep (* 1000 60 60 2))
             (recur))))
 
-(import-all)
+
+

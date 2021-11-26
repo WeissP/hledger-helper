@@ -10,8 +10,7 @@
   []
   (aq/delete-loc-files)
   (aq/gen-env "paypal" {})
-  (sh (str paypal-dir "script.exp"))
-  (println "finished"))
+  (sh (str paypal-dir "script.exp")))
 
 (def paypal-acount "asserts:paypal")
 

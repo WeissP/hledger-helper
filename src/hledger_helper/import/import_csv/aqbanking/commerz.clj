@@ -1,7 +1,8 @@
 (ns hledger-helper.import.import-csv.aqbanking.commerz
-  (:require [hledger-helper.import.import-csv.aqbanking.aqbanking :as aq]
-            [clojure.java.io :as io]
-            [clojure.java.shell :refer [sh]]))
+  (:require [clojure.java.io :as io]
+            [clojure.string :as string]
+            [clojure.java.shell :refer [sh]]
+            [hledger-helper.import.import-csv.aqbanking.aqbanking :as aq]))
 
 (def commerz-dir (.getPath (io/resource "aqbanking/commerz/")))
 
@@ -23,7 +24,9 @@
    :sep \;,
    :date :date,
    :compare-fields {},
-   :remove-maps [{:remoteAccountNumber (comp empty? first)}],
+   :remove-maps [{:remoteBankCode #(= "00000000" (first %))}
+                 {:remoteAccountNumber (comp empty? first),
+                  :value_value #(string/starts-with? % "-")}],
    :to-transaction to-transaction,
    :update-fn update-csv})
 
