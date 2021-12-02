@@ -61,12 +61,28 @@
   []
   (filter #(not= (:amount (second %)) 0) (pedn/get-budget-mod)))
 
-(defn get-budget-mod-total-amounts
-  "calculate total amounts in `date`"
-  [date]
-  (let [mods (pedn/get-budget-mod)]
-    (reduce +
-      (filter some? (map #(get-budget-mod-amount % date) (keys mods))))))
+(defn get-pure-budget-mods
+  []
+  (filter #(and (not (:end? (second %))) (= (:amount (second %)) 0))
+    (pedn/get-budget-mod)))
+
+(defn get-budget-mod-amounts
+  [date mods]
+  (reduce + (filter some? (map #(get-budget-mod-amount % date) (keys mods)))))
+
+;; (defn get-budget-non-empty-mod-amounts
+;;   "calculate total amounts in `date`"
+;;   [date]
+;;   (let [mods (get-non-empty-amount-budget-mods)]
+;;     (reduce +
+;;       (filter some? (map #(get-budget-mod-amount % date) (keys mods))))))
+
+;; (defn get-budget-pure-mod-amounts
+;;   "calculate total amounts in `date`"
+;;   [date]
+;;   (let [mods (get-pure-budget-mods)]
+;;     (reduce +
+;;       (filter some? (map #(get-budget-mod-amount % date) (keys mods))))))
 
 (defn get-budget-revenues-total-amount
   ([] (get-budget-revenues-total-amount (date/current-month)))
@@ -78,7 +94,7 @@
    (+ (pedn/get-budget-amount)
       (get-budget-revenues-total-amount month)
       (:amount (pedn/get-budget-rollover))
-      (get-budget-mod-total-amounts month))))
+      (get-budget-mod-amounts month (get-pure-budget-mods)))))
 
 (defn update-budget-rollover
   "update budget rollover to current month"
@@ -90,9 +106,11 @@
       (pedn/update-rollover (- budget-amount
                                (info/get-cost-by-month rollover-month)))
       (doseq [k (keys (get-non-empty-amount-budget-mods))]
-        (pedn/update-budget-mod-amount
-          k
-          (get-budget-mod-amount k (inc rollover-month))))
+        (pedn/budget-transfer k
+                              (get-budget-mod-amount
+                                k
+                                (date/get-the-last-day-of-month
+                                  rollover-month))))
       (update-budget-rollover))))
 
 (defn budget-report
@@ -106,10 +124,11 @@
          days-in-month-flt (/ day-of-month length-of-month)
          used-budget (- (info/get-cost-by-month current-month)
                         (get-non-budget-cost current-month))
-         expected-total-budget (- (get-budget-total-amounts)
-                                  (get-non-budget-cost
-                                    (ld/get-month-value
-                                      (ld/minus-months (ld/now) 1))))
+         expected-total-budget
+           (+ (- (get-budget-total-amounts)
+                 (get-non-budget-cost (ld/get-month-value
+                                        (ld/minus-months (ld/now) 1))))
+              (get-budget-mod-amounts current-month (get-non-empty-amount-budget-mods)))
          rest-budget (- expected-total-budget used-budget)]
      (print (info/get-costs-by-depth depth))
      (println

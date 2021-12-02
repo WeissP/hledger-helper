@@ -65,6 +65,15 @@
                     ld/to-string)]
     {:date-from date-from, :date-to date-to}))
 
+(defn get-the-last-day-of-month
+  [month]
+  (-> month
+      to-local-date
+      (ld/plus-months 1)
+      (ld/plus-days -1)
+      ld/to-string))
+
+
 (defn sort-maps-by-date
   [maps & {:keys [date-key], :or {date-key "date"}}]
   maps

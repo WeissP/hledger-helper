@@ -30,7 +30,8 @@ the start amount
 
 total delta amount. e.g. -100 means your budget amount need to decrease 100 in several month.
 
-if amount is zero, means that this budget modifier doesn't change budget total amount (e.g.  +20 € in this month but -20€ in next month)
+if amount is zero, means that this budget modifier is a pure budget modifier and doesn't change budget total amount (e.g.  +20 € in this month but -20€ in next month)
+Otherwise its called non-empty modifier.
 
 **** end?
 

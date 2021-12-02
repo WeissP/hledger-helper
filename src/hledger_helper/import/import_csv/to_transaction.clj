@@ -8,17 +8,22 @@
 (defn- info->account
   "parse `info` to `account` by `import-transactions` and `special-info-account-maps`"
   [info & [special-info-account-maps]]
-  (let [desc-type-maps (merge @pedn/import-transactions
-                              special-info-account-maps)
-        info (string/lower-case info)]
-    (some
-      (fn [[k v]]
-        (cond (string? k) (when (string/includes? info (string/lower-case k)) v)
-              (vector? k)
-                (when (every? #(string/includes? info (string/lower-case %)) k)
-                  v)
-              :else nil))
-      desc-type-maps)))
+  (let [info (string/lower-case info)
+        parse
+          (fn [m]
+            (some
+              (fn [[k v]]
+                (cond (string? k)
+                        (when (string/includes? info (string/lower-case k)) v)
+                      (vector? k) (when (every? #(string/includes?
+                                                   info
+                                                   (string/lower-case %))
+                                                k)
+                                    v)
+                      :else nil))
+              m))
+        info-in-special (parse special-info-account-maps)]
+    (if info-in-special info-in-special (parse @pedn/import-transactions))))
 
 (defn to-transaction
   [info bank-date amount1 currency1 account2 &
