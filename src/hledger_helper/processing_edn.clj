@@ -36,7 +36,7 @@
                  (update-in [:budget :rollover :amount] (constantly amount)))))
 
 (defn update-budget-mod-amount
-  "update non-zero budget mod amount, if updated amount is over or equal zero, then amount will be set to 0 and this modifier will be moved to finished-modifiers and return the difference (e.g. amount=5, delta=-8, then new amount=0 and return -3), otherwise return `nil`"
+  "update non-zero budget mod amount, if updated amount is over or equal zero, then amount will be set to 0 and this modifier will be moved to finished-modifiers and return the orginal amount, otherwise return `nil`"
   [k delta-amount]
   (let [v (get-in (read-edn) [:budget :modifiers k])
         ori-amount (:amount v)]
@@ -49,7 +49,7 @@
                            (update-in [:budget :modifiers] dissoc k)
                            (update-in [:budget :finished-modifiers k]
                                       (constantly (assoc v :amount 0)))))
-            (if (= ori-amount delta-amount) nil (+ ori-amount delta-amount)))
+            (if (= ori-amount delta-amount) nil ori-amount))
       :else (write-edn (update-in (read-edn)
                                   [:budget :modifiers k :amount]
                                   #(- % delta-amount))))))

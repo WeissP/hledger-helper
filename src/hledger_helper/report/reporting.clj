@@ -103,7 +103,8 @@
         current-month (ld/get-month-value (ld/now))
         budget-amount (get-budget-total-amounts rollover-month)]
     (when-not (= rollover-month current-month)
-      (pedn/update-rollover (- budget-amount
+      (pedn/update-rollover (- (+ budget-amount
+                                  (get-non-budget-cost rollover-month))
                                (info/get-cost-by-month rollover-month)))
       (doseq [k (keys (get-non-empty-amount-budget-mods))]
         (pedn/budget-transfer k
